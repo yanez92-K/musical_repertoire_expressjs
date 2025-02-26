@@ -29,22 +29,24 @@ app.post("/canciones", (req, res) => {
     res.send("Canción agregada con éxito!");
 });
 
-app.put("/canciones/:id", (req, res) => {
-    const id  = req.params.id;
-    const cancionAModificar = req.body;
-    const canciones = JSON.parse(fs.readFileSync("canciones.json"));
-
-    let indexCancionAModificar = canciones.findIndex(cancion => cancion.id == id);
-
-    if (indexCancionAModificar === -1) {
-        return res.status(404).send("Canción no encontrada");
+app.put("/canciones/:id", async (req, res) => {
+    const id = req.params.id;
+    let canciones = JSON.parse(fs.readFileSync("canciones.json"));
+    const cancion = canciones.find((cancion) => cancion.id === id);
+    if (!cancion) {
+        res.status(404).json({ message: "Canción not found" });
     }
-
-    canciones[indexCancionAModificar] = cancionAModificar;
-    fs.writeFileSync("canciones.json", JSON.stringify(canciones));
-    res.send("Canción Modificada con éxito!");
-
-})
+    canciones = canciones.map((cancion) => {
+        if (cancion.id === id) {
+            return { ...cancion, done: !cancion.done };
+        }
+        return cancion;  
+    });
+    
+    fs.writeFile("canciones.json", JSON.stringify(canciones, null, 2));
+    res.json(canciones);
+    });
+    
 
 app.delete("/canciones/:id", (req, res) => {
     const id  = req.params.id;
