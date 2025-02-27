@@ -1,60 +1,80 @@
 
-const express = require('express');
-const fs = require('fs');
+const express = require("express");
+const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
+const PORT = 3000;
 
+app.use(cors());
 
-app.use(express.json())
+app.use(express.json());
 
-app.listen(3000, () => {
-    console.log("Servidor iniciado")
-})
+// Servir archivos estáticos desde la carpeta "public"
+app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/", (req, res) =>{
-    res.send("Tamara Zapata G")
+// Servir el frontend en la ruta raíz 
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-
+// Rutas de la API 
 app.get("/canciones", (req, res) => {
-    let canciones = JSON.parse(fs.readFileSync('canciones.json', 'utf8'));
-    res.json(canciones);
+  let canciones = JSON.parse(fs.readFileSync("repertorio.json", "utf8"));
+  res.json(canciones);
 });
 
 app.post("/canciones", (req, res) => {
-    const cancion = req.body;
-    const canciones = JSON.parse(fs.readFileSync("canciones.json"));
-    canciones.push(cancion);
-    fs.writeFileSync("canciones.json", JSON.stringify(canciones));
-    res.send("Canción agregada con éxito!");
+  const cancion = req.body;
+  const canciones = JSON.parse(fs.readFileSync("repertorio.json"));
+  canciones.push(cancion);
+  fs.writeFileSync("repertorio.json", JSON.stringify(canciones, null, 2));
+  res.send("Canción agregada con éxito!");
 });
 
-app.put("/canciones/:id", async (req, res) => {
-    const id = req.params.id;
-    let canciones = JSON.parse(fs.readFileSync("canciones.json"));
-    const cancion = canciones.find((cancion) => cancion.id === id);
-    if (!cancion) {
-        res.status(404).json({ message: "Canción not found" });
-    }
-    canciones = canciones.map((cancion) => {
-        if (cancion.id === id) {
-            return { ...cancion, done: !cancion.done };
-        }
-        return cancion;  
-    });
-    
-    fs.writeFile("canciones.json", JSON.stringify(canciones, null, 2));
-    res.json(canciones);
-    });
-    
+app.put("/canciones/:id", (req, res) => {
+  const id = Number(req.params.id);
+  let canciones = JSON.parse(fs.readFileSync("repertorio.json"));
+
+  const index = canciones.findIndex((cancion) => Number(cancion.id) === id);
+  if (index === -1) {
+    return res.status(404).json({ message: "Song not found" });
+  }
+
+  canciones[index] = { ...canciones[index], ...req.body };
+  fs.writeFileSync("repertorio.json", JSON.stringify(canciones, null, 2));
+  res.json({
+    message: "Canción actualizada con éxito",
+    cancion: canciones[index],
+  });
+});
 
 app.delete("/canciones/:id", (req, res) => {
-    const id  = req.params.id;
-    const canciones = JSON.parse(fs.readFileSync("canciones.json"));
-    
-    let indexCancionAEliminar = canciones.findIndex(cancion => cancion.id == id);
+  try {
+    const id = Number(req.params.id);
+    let canciones = JSON.parse(fs.readFileSync("repertorio.json"));
 
-    canciones.splice(indexCancionAEliminar, 1)
-    fs.writeFileSync("canciones.json", JSON.stringify(canciones))
-    res.send("Canción Eliminada con éxito!")
-})
+    const nuevasCanciones = canciones.filter(
+      (cancion) => Number(cancion.id) !== id
+    );
+
+    if (canciones.length === nuevasCanciones.length) {
+      return res.status(404).json({ message: "Song not found" });
+    }
+
+    fs.writeFileSync(
+      "repertorio.json",
+      JSON.stringify(nuevasCanciones, null, 2)
+    );
+    res.send("Canción eliminada con éxito!");
+  } catch (error) {
+    res.status(500).json({ error: "Error al eliminar la canción" });
+  }
+});
+
+// Iniciar el servidor en el puerto 3000
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
+
