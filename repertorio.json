@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": "1",
     "titulo": "Imagine",
     "artista": "John Lennon",
     "tono": "C"
@@ -18,9 +18,9 @@
     "tono": "D"
   },
   {
-    "id": "4",
-    "titulo": "Historia de taxi",
-    "artista": "Ricardo Aejona",
+    "id": "9633",
+    "titulo": "Cara Luna",
+    "artista": "Bacilos",
     "tono": "F"
   }
 ]

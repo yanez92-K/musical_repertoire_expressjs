@@ -21,21 +21,21 @@ app.get("/", (req, res) => {
 
 // Rutas de la API 
 app.get("/canciones", (req, res) => {
-  let canciones = JSON.parse(fs.readFileSync("canciones.json", "utf8"));
+  let canciones = JSON.parse(fs.readFileSync("repertorio.json", "utf8"));
   res.json(canciones);
 });
 
 app.post("/canciones", (req, res) => {
   const cancion = req.body;
-  const canciones = JSON.parse(fs.readFileSync("canciones.json"));
+  const canciones = JSON.parse(fs.readFileSync("repertorio.json"));
   canciones.push(cancion);
-  fs.writeFileSync("canciones.json", JSON.stringify(canciones, null, 2));
+  fs.writeFileSync("repertorio.json", JSON.stringify(canciones, null, 2));
   res.send("Canción agregada con éxito!");
 });
 
 app.put("/canciones/:id", (req, res) => {
   const id = Number(req.params.id);
-  let canciones = JSON.parse(fs.readFileSync("canciones.json"));
+  let canciones = JSON.parse(fs.readFileSync("repertorio.json"));
 
   const index = canciones.findIndex((cancion) => Number(cancion.id) === id);
   if (index === -1) {
@@ -43,7 +43,7 @@ app.put("/canciones/:id", (req, res) => {
   }
 
   canciones[index] = { ...canciones[index], ...req.body };
-  fs.writeFileSync("canciones.json", JSON.stringify(canciones, null, 2));
+  fs.writeFileSync("repertorio.json", JSON.stringify(canciones, null, 2));
   res.json({
     message: "Canción actualizada con éxito",
     cancion: canciones[index],
@@ -53,7 +53,7 @@ app.put("/canciones/:id", (req, res) => {
 app.delete("/canciones/:id", (req, res) => {
   try {
     const id = Number(req.params.id);
-    let canciones = JSON.parse(fs.readFileSync("canciones.json"));
+    let canciones = JSON.parse(fs.readFileSync("repertorio.json"));
 
     const nuevasCanciones = canciones.filter(
       (cancion) => Number(cancion.id) !== id
@@ -64,7 +64,7 @@ app.delete("/canciones/:id", (req, res) => {
     }
 
     fs.writeFileSync(
-      "canciones.json",
+      "repertorio.json",
       JSON.stringify(nuevasCanciones, null, 2)
     );
     res.send("Canción eliminada con éxito!");
