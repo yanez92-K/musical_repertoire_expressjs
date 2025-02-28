@@ -19,5 +19,13 @@
   "devDependencies": {
     "nodemon": "^3.1.9"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tamarazapata/musical_repertoire_expressjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tamarazapata/musical_repertoire_expressjs/issues"
+  },
+  "homepage": "https://github.com/tamarazapata/musical_repertoire_expressjs#readme",
   "description": ""
 }

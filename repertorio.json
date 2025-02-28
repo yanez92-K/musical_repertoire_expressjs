@@ -1,17 +1,5 @@
 [
   {
-    "id": "1",
-    "titulo": "Imagine",
-    "artista": "John Lennon",
-    "tono": "C"
-  },
-  {
-    "id": "2",
-    "titulo": "LaLa",
-    "artista": "31 Minutos",
-    "tono": "F"
-  },
-  {
     "id": "3",
     "titulo": "Zun da da",
     "artista": "Zion ",
@@ -21,6 +9,18 @@
     "id": "9633",
     "titulo": "Cara Luna",
     "artista": "Bacilos",
-    "tono": "F"
+    "tono": "D"
+  },
+  {
+    "id": 1237,
+    "titulo": "More",
+    "artista": "Usher",
+    "tono": "D"
+  },
+  {
+    "id": 3102,
+    "titulo": "Envolver",
+    "artista": "Anita",
+    "tono": "A"
   }
 ]
