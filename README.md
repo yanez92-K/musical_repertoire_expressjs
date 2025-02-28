@@ -75,5 +75,5 @@ DELETE ```/canciones/:id```
 El frontend se sirve desde ```public/index.html```, permitiendo la gestión del repertorio mediante formularios y botones para agregar, editar y eliminar canciones.
 
 ## Autoras
-* Pamela y Tamara
+* Pamela Yáñez y Tamara Zapata
 
