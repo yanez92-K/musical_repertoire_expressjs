@@ -1,4 +1,3 @@
-
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
@@ -14,12 +13,12 @@ app.use(express.json());
 // Servir archivos estáticos desde la carpeta "public"
 app.use(express.static(path.join(__dirname, "public")));
 
-// Servir el frontend en la ruta raíz 
+// Servir el frontend en la ruta raíz
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Rutas de la API 
+// Rutas de la API
 app.get("/canciones", (req, res) => {
   let canciones = JSON.parse(fs.readFileSync("repertorio.json", "utf8"));
   res.json(canciones);
@@ -27,27 +26,40 @@ app.get("/canciones", (req, res) => {
 
 app.post("/canciones", (req, res) => {
   const cancion = req.body;
-  const canciones = JSON.parse(fs.readFileSync("repertorio.json"));
-  canciones.push(cancion);
+  let canciones = JSON.parse(fs.readFileSync("repertorio.json", "utf8"));
+
+  // Generar un ID autoincremental
+  const newId =
+    canciones.length > 0 ? canciones[canciones.length - 1].id + 1 : 1;
+  const newSong = { id: newId, ...cancion };
+
+  canciones.push(newSong);
   fs.writeFileSync("repertorio.json", JSON.stringify(canciones, null, 2));
-  res.send("Canción agregada con éxito!");
+
+  res
+    .status(201)
+    .json({ message: "Canción agregada con éxito!", cancion: newSong });
 });
 
 app.put("/canciones/:id", (req, res) => {
-  const id = Number(req.params.id);
-  let canciones = JSON.parse(fs.readFileSync("repertorio.json"));
+  try {
+    const id = Number(req.params.id);
+    let canciones = JSON.parse(fs.readFileSync("repertorio.json"));
 
-  const index = canciones.findIndex((cancion) => Number(cancion.id) === id);
-  if (index === -1) {
-    return res.status(404).json({ message: "Song not found" });
+    const index = canciones.findIndex((cancion) => Number(cancion.id) === id);
+    if (index === -1) {
+      return res.status(404).json({ message: "Canción no encontrada" });
+    }
+
+    canciones[index] = { ...canciones[index], ...req.body };
+    fs.writeFileSync("repertorio.json", JSON.stringify(canciones, null, 2));
+    res.json({
+      message: "Canción actualizada con éxito",
+      cancion: canciones[index],
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error al actualizar la canción" });
   }
-
-  canciones[index] = { ...canciones[index], ...req.body };
-  fs.writeFileSync("repertorio.json", JSON.stringify(canciones, null, 2));
-  res.json({
-    message: "Canción actualizada con éxito",
-    cancion: canciones[index],
-  });
 });
 
 app.delete("/canciones/:id", (req, res) => {
@@ -60,7 +72,7 @@ app.delete("/canciones/:id", (req, res) => {
     );
 
     if (canciones.length === nuevasCanciones.length) {
-      return res.status(404).json({ message: "Song not found" });
+      return res.status(404).json({ message: "Canción no encontrada" });
     }
 
     fs.writeFileSync(
@@ -77,4 +89,3 @@ app.delete("/canciones/:id", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
-
